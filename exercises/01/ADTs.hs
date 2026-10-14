@@ -52,10 +52,10 @@ b a =
   let aaaa :: Int
       aaaa = aaaa
    in cc + c 1
- where
-  c x = x + 2
-  cc :: Int
-  cc = 2 + a
+  where
+    c x = x + 2
+    cc :: Int
+    cc = 2 + a
 
 ----------------------------------------------
 -- RPS (Rock, Paper, Scissors) and Booleans --
@@ -66,7 +66,6 @@ b a =
 -- TODO: show `case` here
 data RPS = Rock | Paper | Scissors
   deriving (Show)
-
 
 -- `beats` function: Implement the logic for which RPS beats another
 -- TODO:
@@ -92,8 +91,8 @@ beats _ _ = False
 abss :: Int -> Int
 -- abss x = if x < 0 then -x else x
 abss x
- | x < 0 = -x
- | otherwise = x
+  | x < 0 = -x
+  | otherwise = x
 
 -- TASK:
 -- Define the "next" throw you can do in the "usual" ordering of RPS
@@ -102,7 +101,9 @@ abss x
 -- >>> next Rock
 -- Paper
 next :: RPS -> RPS
-next = undefined
+next Rock = Paper
+next Paper = Scissors
+next Scissors = Paper
 
 -- TASK:
 -- Define what it means for two RPS values to be equal
@@ -114,7 +115,10 @@ next = undefined
 -- False
 
 eqRPS :: RPS -> RPS -> Bool
-eqRPS = undefined
+eqRPS Rock Rock = True
+eqRPS Paper Paper = True
+eqRPS Scissors Scissors = True
+eqRPS _ _ = False
 
 -- TASK:
 -- Define a shorter version of beats using next and eqRPS
@@ -125,7 +129,7 @@ eqRPS = undefined
 -- True
 
 beats' :: RPS -> RPS -> Bool
-beats' = undefined
+beats' a b = eqRPS b (next a)
 
 ------------
 -- Points --
@@ -244,6 +248,7 @@ data Expr
   deriving (Show)
 
 infixr 7 `Plus`
+
 infixr 8 `Mult`
 
 -- TASK:
