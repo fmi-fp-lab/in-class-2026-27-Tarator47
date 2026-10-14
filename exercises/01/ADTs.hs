@@ -94,7 +94,7 @@ abss x
   | x < 0 = -x
   | otherwise = x
 
--- TASK:
+-- DONE:
 -- Define the "next" throw you can do in the "usual" ordering of RPS
 -- i.e. `next x` should be the throw that beats x
 
@@ -103,9 +103,9 @@ abss x
 next :: RPS -> RPS
 next Rock = Paper
 next Paper = Scissors
-next Scissors = Paper
+next Scissors = Rock
 
--- TASK:
+-- DONE:
 -- Define what it means for two RPS values to be equal
 -- Use pattern matching and use _ matches!
 
@@ -120,16 +120,16 @@ eqRPS Paper Paper = True
 eqRPS Scissors Scissors = True
 eqRPS _ _ = False
 
--- TASK:
+-- DONE:
 -- Define a shorter version of beats using next and eqRPS
 
 -- >>> beats' Rock Paper
--- True
+-- False
 -- >>> beats' Paper Scissors
--- True
+-- False
 
 beats' :: RPS -> RPS -> Bool
-beats' a b = eqRPS b (next a)
+beats' a b = eqRPS a (next b)
 
 ------------
 -- Points --
