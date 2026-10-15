@@ -283,38 +283,66 @@ eval (If c t e) = if eval c /= 0 then eval t else eval e
 ------------
 
 -- Data type for Ranks in a card game
-data Rank = A
+data Rank = Seven | Eight | Nine | Ten | Jack | Queen | King | Ace
   deriving (Show)
 
 -- Data type for Suits in a card game
-data Suit = B
+data Suit = Clubs | Diamonds | Hearts | Spades
   deriving (Show)
 
--- TASK:
+-- DONE:
 -- Check if two suits are equal
 suitEquals :: Suit -> Suit -> Bool
-suitEquals = undefined
+suitEquals Clubs Clubs = True
+suitEquals Diamonds Diamonds = True
+suitEquals Hearts Hearts = True
+suitEquals Spades Spades = True
+suitEquals _ _ = False
 
 -- TODO: Record syntax for representing a Card
 data Card = MkCard {rank :: Rank, suit :: Suit}
   deriving (Show)
 
 -- Data type for Contracts in the Belote game
-data Contract
+data Contract = Trumps Suit | NoTrumps | AllTrumps
   deriving (Show)
 
--- TASK:
+-- DONE:
 -- Check if a card is of a trump suit based on a given contract
 isTrump :: Contract -> Card -> Bool
-isTrump = undefined
+isTrump (Trumps s) c = suitEquals s (suit c)
+isTrump NoTrumps _ = False
+isTrump AllTrumps _ = True
 
--- TASK:
+-- DONE:
 -- Assign a numerical power value to a card based on the contract
 -- Ensure that higher power values represent stronger cards
 cardPower :: Contract -> Card -> Integer
-cardPower = undefined
+cardPower contract c
+  | isTrump contract c = 100 + trumpPower (rank c)
+  | otherwise = plainPower (rank c)
+  where
+    trumpPower :: Rank -> Integer
+    trumpPower Seven = 0
+    trumpPower Eight = 1
+    trumpPower Queen = 2
+    trumpPower King = 3
+    trumpPower Ten = 4
+    trumpPower Ace = 5
+    trumpPower Nine = 6
+    trumpPower Jack = 7
 
--- TASK:
+    plainPower :: Rank -> Integer
+    plainPower Seven = 0
+    plainPower Eight = 1
+    plainPower Nine = 2
+    plainPower Jack = 3
+    plainPower Queen = 4
+    plainPower King = 5
+    plainPower Ten = 6
+    plainPower Ace = 7
+
+-- DONE:
 -- A data type to describe the different ways two cards can relate, given a contract
 -- See the 'sameSuit' and 'relateCards' functions below to get a better sense of how
 -- you'll be producing this data type, and hence what constructors it should have
@@ -333,30 +361,63 @@ cardPower = undefined
 -- HINT:
 -- The intended solution has 4 constructors
 data CardRelation
+  = SameSuit
+  | FirstTrumps
+  | SecondTrumps
+  | Unrelated
   deriving (Show)
 
--- TASK:
+-- DONE:
 -- Given a contract, calculate how two cards relate
 relateCards :: Contract -> Card -> Card -> CardRelation
-relateCards = undefined
+relateCards contract c1 c2
+  | suitEquals (suit c1) (suit c2) = SameSuit
+  | isTrump contract c1 && not (isTrump contract c2) = FirstTrumps
+  | not (isTrump contract c1) && isTrump contract c2 = SecondTrumps
+  | otherwise = Unrelated
 
--- TASK:
+-- DONE:
 -- Given a contract and two cards, return the winning card
 -- Assume the first card is played first
 fight :: Contract -> Card -> Card -> Card
-fight = undefined
+fight contract c1 c2 = case relateCards contract c1 c2 of
+  SameSuit -> if cardPower contract c2 > cardPower contract c1 then c2 else c1
+  FirstTrumps -> c1
+  SecondTrumps -> c2
+  Unrelated -> c1
 
 -- Data type for a trick (игра, разигравка, ръка, рунд), consisting of four cards
-data Trick
+data Trick = MkTrick Card Card Card Card
   deriving (Show)
 
--- TASK:
+-- DONE:
 -- Given a contract and a Trick, determine the winning card
 -- Remember that the leftmost card was played first
 winner :: Contract -> Trick -> Card
-winner = undefined
+winner contract (MkTrick c1 c2 c3 c4) =
+  fight contract (fight contract (fight contract c1 c2) c3) c4
 
--- TASK:
+-- DONE:
 -- Check if a Trick could have been played according to the rules of Belote
+-- Hands are unknown, so the checkable rule is that a deck has no duplicate cards
 isValid :: Contract -> Trick -> Bool
-isValid = undefined
+isValid _ (MkTrick c1 c2 c3 c4) =
+  distinct c1 [c2, c3, c4] && distinct c2 [c3, c4] && distinct c3 [c4]
+  where
+    distinct :: Card -> [Card] -> Bool
+    distinct _ [] = True
+    distinct c (x : xs) = not (sameCard c x) && distinct c xs
+
+    sameCard :: Card -> Card -> Bool
+    sameCard x y = suitEquals (suit x) (suit y) && rankEquals (rank x) (rank y)
+
+    rankEquals :: Rank -> Rank -> Bool
+    rankEquals Seven Seven = True
+    rankEquals Eight Eight = True
+    rankEquals Nine Nine = True
+    rankEquals Ten Ten = True
+    rankEquals Jack Jack = True
+    rankEquals Queen Queen = True
+    rankEquals King King = True
+    rankEquals Ace Ace = True
+    rankEquals _ _ = False
