@@ -170,7 +170,7 @@ data Nat = Zero | Succ Nat
 -- Succ (Succ Zero)
 -- 1+ 1+ 0
 
--- TASK:
+-- DONE:
 -- Convert an Integer to Nat
 
 -- >>> integerToNat 3
@@ -182,7 +182,7 @@ integerToNat x =
     then Zero
     else Succ (integerToNat (x - 1))
 
--- TASK:
+-- DONE:
 -- Convert a Nat back to an Integer
 
 -- >>> natToInteger (Succ (Succ Zero))
@@ -192,7 +192,7 @@ natToInteger :: Nat -> Integer
 natToInteger Zero = 0
 natToInteger (Succ x) = 1 + natToInteger x
 
--- TASK:
+-- DONE:
 -- Add two Nats
 
 -- >>> addNat (Succ Zero) (Succ Zero)
@@ -209,32 +209,38 @@ addNat (Succ n1) n2 = Succ (addNat n1 n2)
 -- Succ (Succ (addNat Zero (Succ Zero)))
 -- Succ (Succ (Succ Zero))
 
--- TASK:
+-- DONE:
 -- Multiply two Nats
 
 -- >>> multNat (Succ (Succ Zero)) (Succ (Succ (Succ Zero)))
 -- Succ (Succ (Succ (Succ (Succ (Succ Zero)))))
 
 multNat :: Nat -> Nat -> Nat
-multNat = undefined
+multNat Zero _ = Zero
+multNat (Succ n1) n2 = addNat n2 (multNat n1 n2)
 
--- TASK:
+-- DONE:
 -- Compare two Nats, returning an Ordering
 
 -- >>> compareNat (Succ Zero) Zero
 -- GT
 
 compareNat :: Nat -> Nat -> Ordering
-compareNat = undefined
+compareNat Zero Zero = EQ
+compareNat Zero (Succ _) = LT
+compareNat (Succ _) Zero = GT
+compareNat (Succ n1) (Succ n2) = compareNat n1 n2
 
--- TASK:
+-- DONE:
 -- Return the maximum of two Nats
 
 -- >>> maxNat (Succ Zero) (Succ (Succ Zero))
 -- Succ (Succ Zero)
 
 maxNat :: Nat -> Nat -> Nat
-maxNat = undefined
+maxNat n1 n2 = case compareNat n1 n2 of
+  LT -> n2
+  _ -> n1
 
 -----------------
 -- Expressions --
