@@ -251,13 +251,14 @@ data Expr
   = Val Integer
   | Plus Expr Expr
   | Mult Expr Expr
+  | If Expr Expr Expr
   deriving (Show)
 
 infixr 7 `Plus`
 
 infixr 8 `Mult`
 
--- TASK:
+-- DONE:
 -- Evaluate an expression in the Expr language
 
 -- >>> eval (Val 3)
@@ -268,9 +269,12 @@ infixr 8 `Mult`
 -- 12
 
 eval :: Expr -> Integer
-eval = undefined
+eval (Val n) = n
+eval (Plus l r) = eval l + eval r
+eval (Mult l r) = eval l * eval r
+eval (If c t e) = if eval c /= 0 then eval t else eval e
 
--- TASK:
+-- DONE:
 -- Extend the Expr language with If expressions
 -- Interpret 0 as "false" and any non-zero value as "true"
 
